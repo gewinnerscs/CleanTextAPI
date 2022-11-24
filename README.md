@@ -5,7 +5,7 @@ In order to get the whole process, please find on the architecture <br>
 ## System Architecture
 <img width="872" alt="image" src="https://user-images.githubusercontent.com/26571248/203693956-6f005d3c-7b07-4af2-a32e-27e19eb75ace.png">
 
-##File Explanation
+## File Explanation
 1. app.py : the main program for cleaning text and file
 2. re_dataset.csv : the sample input file to be cleaned
 3. Data_Analysis.ipynb : code for analysis the result e.q visualization and statictical analysis
