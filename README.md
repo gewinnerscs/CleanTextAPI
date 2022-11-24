@@ -6,7 +6,7 @@ In order to get the whole process, please find on the architecture <br>
 <br>
 <img width="872" alt="image" src="https://user-images.githubusercontent.com/26571248/203693956-6f005d3c-7b07-4af2-a32e-27e19eb75ace.png">
 <br>
-## Result example
+## Result Example
 <br>
 ### Text clean
 <br>
