@@ -5,6 +5,14 @@ import pandas as pd
 from flasgger import LazyJSONEncoder, LazyString, Swagger, swag_from
 from flask import Flask, jsonify, request
 
+#Introducing the global variable
+connection = sql.connect('main.db', check_same_thread=False)
+cursor = connection.cursor()
+abusive = pd.read_sql('select * from Abusive', connection)
+list_abusive = abusive['ABUSIVE'].to_list()  
+alay  = pd.read_sql('select * from Kamus_alay', connection) 
+dict_alay = dict(alay.values)
+
 app = Flask(__name__)
 app.json_encoder = LazyJSONEncoder
 swagger_template = dict(
@@ -34,18 +42,17 @@ swagger = Swagger(app, template=swagger_template,config=swagger_config)
 @app.route('/', methods=['GET'])
 #Function for showing home page
 def home():
-     json_response = {
-         'status_code': 200,
-         'description': "API Text and File Cleansing",
-     }
-     response_data = jsonify(json_response)
-     return response_data
+    json_response = {
+        'status_code': 200,
+        'description': "API Text and File Cleansing",
+        }
+    response_data = jsonify(json_response)
+    return response_data
 
 @swag_from("docs/all_data.yml", methods=['GET'])
 @app.route('/all_data', methods=['GET'])
 #Function for showing all data from database
 def database():
-    connection = sql.connect('main.db')
     all_data = pd.read_sql('SELECT * from Tweet',connection)
     all_data = all_data.T.to_dict()
     return jsonify(
@@ -59,23 +66,12 @@ def database():
 #Function for text cleaning from input text
 def text_clean():
     text = request.form['raw_text']
-    connection = sql.connect('main.db')
-    #Clean text based on the abusive list
-    #All abusive words in the text is cencored
-    #abusive = pd.read_csv('abusive.csv')                              #read abusive.csv
-    cursor = connection.cursor()
-    abusive = pd.read_sql('select * from Abusive', connection)
-    list_abusive = abusive['ABUSIVE'].to_list()                       #convert abusive.csv to list
     data_text = text.split()                                          #convert input text to list
     for dat_text in range(len(data_text)):                            #looping thorough input text list
         for abusive in range(len(list_abusive)):                      #looping thorough list_abusive to find matche words
             if list_abusive[abusive] == data_text[dat_text]:          #find match words between input text list and abusive list
                 data_text[dat_text] = '*'*len(data_text[dat_text])    #subsitute matched words with * 
     cleaned_data = ' '.join(data_text)                                #convert to string
-
-    #Clean text again based on kamusalaya.csv
-    alay = pd.read_sql('select * from Kamus_alay', connection)        #read kamusalay from databse
-    dict_alay = dict(alay.values)                                     #convert dataframe to dict
     cleaned_data = ' '.join(dict_alay.get(alay_word,alay_word) for alay_word in cleaned_data.split())   #find matched word from key, subsitute with values of dict and covert to string
 
     #Capitalize the text
@@ -95,9 +91,8 @@ def text_clean():
     #Remove multiple white space
     cleaned_data = re.sub(r'^\s+ | \s+$','', cleaned_data)
 
-    raw_text = ''.join(text)
-    clean_text = ''.join(cleaned_data)
     query = f"INSERT INTO Tweet (Raw_text, Clean_text) VALUES ('{text}','{cleaned_data}')"
+    
     cursor.execute(query)
     connection.commit()
 
@@ -112,11 +107,9 @@ def text_clean():
 @app.route('/file_clean', methods=['POST'])
 #Function for file cleaning from file
 def file_clean():
-    connection = sql.connect('main.db')
     file      = request.files['data_file']                                                #Request data file from uploaded file
     file      = pd.read_csv(file, encoding='latin-1')
-    #df_tweet = pd.read_sql('select * from Tweet', connection)                            #Read table from database (main.db)
-    # Remove new line from text in between 
+#   # Remove new line from text in between 
     re_tweet = file['Tweet'].str.replace(r'\\t|\\n|\\r|\t|\r|\n', '', regex=True)
     # Replace the number in the first sentence
     re_tweet = re_tweet.str.replace(r'^[0-9].','', regex=True)
@@ -140,12 +133,8 @@ def file_clean():
     re_tweet = re_tweet.str.replace(r'^\s+ | \s+$','', regex=True)
     file_regex = re_tweet.to_frame('Raw_text')
 
-    alay  = pd.read_sql('select * from Kamus_alay', connection)                             #Read kamusalay file using pandas format
-    dict_alay = dict(alay.values)                                                           #Convert DataFrame format do dictionary
 
     raw_tweet = [file_regex['Raw_text'][raw].split() for raw in range(len(file_regex))]     #Convert each row to list
-    abusive = pd.read_sql('select * from Abusive', connection)
-    list_abusive = abusive['ABUSIVE'].to_list() 
 
     substitute_text =[]                                                                     #Make a list for substitute_text
     for tweet in range(len(raw_tweet)):                                                     #Looping thorough raw_text
