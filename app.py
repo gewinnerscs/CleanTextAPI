@@ -5,7 +5,7 @@ import pandas as pd
 from flasgger import LazyJSONEncoder, LazyString, Swagger, swag_from
 from flask import Flask, jsonify, request
 
-#Introducing the global variables
+#Declarating the global variables
 connection = sql.connect('main.db', check_same_thread=False)        #Make connection to database
 cursor = connection.cursor()
 abusive = pd.read_sql('select * from Abusive', connection)          #Read abusive from database
