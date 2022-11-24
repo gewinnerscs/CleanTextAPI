@@ -11,7 +11,6 @@ In order to get the whole process, please find on the architecture <br>
 3. Data_Analysis.ipynb : code for analysis the result e.q visualization and statictical analysis
 4. main.db : main database
 5. docs : directory consisted yml file
-<br>
 
 ## Result Example
 Result of the cleaned data will be represented by Raw_text and Clean_text
