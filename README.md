@@ -14,5 +14,3 @@ The abusive words will be cencored with *** and non-standarized words will be su
 The result is the same with the text, the difference is only from the input file which is uploaded file.
 <br>
 <img width="1382" alt="image" src="https://user-images.githubusercontent.com/26571248/203696244-fb4fff44-b479-44ed-8f5a-b8255581d2a9.png">
-
-
