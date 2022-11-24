@@ -5,13 +5,13 @@ import pandas as pd
 from flasgger import LazyJSONEncoder, LazyString, Swagger, swag_from
 from flask import Flask, jsonify, request
 
-#Introducing the global variable
-connection = sql.connect('main.db', check_same_thread=False)
+#Introducing the global variables
+connection = sql.connect('main.db', check_same_thread=False)        #Make connection to database
 cursor = connection.cursor()
-abusive = pd.read_sql('select * from Abusive', connection)
-list_abusive = abusive['ABUSIVE'].to_list()  
-alay  = pd.read_sql('select * from Kamus_alay', connection) 
-dict_alay = dict(alay.values)
+abusive = pd.read_sql('select * from Abusive', connection)          #Read abusive from database
+list_abusive = abusive['ABUSIVE'].to_list()                         #Convert abusive to list
+alay  = pd.read_sql('select * from Kamus_alay', connection)         #Read kamus alay from database 
+dict_alay = dict(alay.values)                                       #Convert kamus alay to dictionary
 
 app = Flask(__name__)
 app.json_encoder = LazyJSONEncoder
@@ -109,7 +109,7 @@ def text_clean():
 def file_clean():
     file      = request.files['data_file']                                                #Request data file from uploaded file
     file      = pd.read_csv(file, encoding='latin-1')
-#   # Remove new line from text in between 
+    # Remove new line from text in between 
     re_tweet = file['Tweet'].str.replace(r'\\t|\\n|\\r|\t|\r|\n', '', regex=True)
     # Replace the number in the first sentence
     re_tweet = re_tweet.str.replace(r'^[0-9].','', regex=True)
